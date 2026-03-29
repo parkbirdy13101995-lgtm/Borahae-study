@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Borahae Study</title>
+  <style>
+    body {
+      background: linear-gradient(to bottom, #2e003e, #4b0082);
+      color: white;
+      font-family: Arial;
+      text-align: center;
+      padding: 20px;
+    }
+    button {
+      padding: 10px;
+      margin: 8px;
+      border-radius: 10px;
+      border: none;
+      background: #a855f7;
+      color: white;
+    }
+    .hidden { display: none; }
+    textarea {
+      width: 80%;
+      height: 80px;
+      border-radius: 10px;
+      padding: 10px;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>💜 Borahae Study</h1>
+
+<!-- SUBJECT -->
+<div id="start">
+  <h3>Select Subject</h3>
+  <button onclick="startQuiz('Math')">Math</button>
+  <button onclick="startQuiz('Science')">Science</button>
+  <button onclick="startQuiz('English')">English</button>
+  <button onclick="startQuiz('Social')">Social</button>
+</div>
+
+<!-- QUIZ -->
+<div id="quiz" class="hidden">
+  <h3 id="subject"></h3>
+  <p id="mode"></p>
+  <p id="question"></p>
+
+  <div id="options"></div>
+
+  <p id="timer"></p>
+</div>
+
+<!-- STUDY MODE -->
+<div id="study" class="hidden">
+  <h2>⏳ Study Mode</h2>
+  <p id="studyText"></p>
+  <p id="studyTimer"></p>
+</div>
+
+<!-- DIARY -->
+<div>
+  <h3>📔 My Space</h3>
+  <textarea id="entry" placeholder="Write your thoughts..."></textarea><br>
+  <button onclick="saveEntry()">Save</button>
+  <p id="saved"></p>
+</div>
+
+<!-- CLUB -->
+<div>
+  <h3>👥 Study Club</h3>
+  <textarea id="goal" placeholder="Write your study goal..."></textarea><br>
+  <button onclick="postGoal()">Post Goal</button>
+  <div id="goalsList"></div>
+</div>
+
+<script>
+
+let questions = [
+  {
+    q: "When did BTS debut?",
+    options: ["2013", "2015", "2012", "2016"],
+    correct: "2013"
+  },
+  {
+    q: "Which is NOT a BTS song?",
+    options: ["Dynamite", "Butter", "Shape of You", "Spring Day"],
+    correct: "Shape of You"
+  }
+];
+
+let current;
+let time;
+let studyTime;
+let trapMode;
+
+function startQuiz(sub) {
+  document.getElementById("start").classList.add("hidden");
+  document.getElementById("quiz").classList.remove("hidden");
+  document.getElementById("subject").innerText = "Study: " + sub;
+
+  loadQuestion();
+}
+
+function loadQuestion() {
+  current = questions[Math.floor(Math.random()*questions.length)];
+  trapMode = Math.random() < 0.5;
+
+  document.getElementById("question").innerText = current.q;
+  document.getElementById("mode").innerText = trapMode ? "⚠ Choose WRONG answer" : "Choose correct answer";
+
+  let optionsHTML = "";
+  current.options.forEach(opt => {
+    optionsHTML += `<button onclick="answer('${opt}')">${opt}</button>`;
+  });
+  document.getElementById("options").innerHTML = optionsHTML;
+
+  time = 10;
+  let t = setInterval(()=>{
+    time--;
+    document.getElementById("timer").innerText = "Time: " + time;
+
+    if(time<=0){
+      clearInterval(t);
+      wrong();
+    }
+  },1000);
+}
+
+function answer(choice){
+  let isCorrect = choice === current.correct;
+
+  if((!trapMode && isCorrect) || (trapMode && !isCorrect)){
+    alert("Oh? Not bad 😏");
+    loadQuestion();
+  } else {
+    wrong();
+  }
+}
+
+function wrong(){
+  document.getElementById("quiz").classList.add("hidden");
+  document.getElementById("study").classList.remove("hidden");
+
+  document.getElementById("studyText").innerText = "Focus now. Come back stronger.";
+
+  studyTime = 1500;
+
+  let s = setInterval(()=>{
+    studyTime--;
+    document.getElementById("studyTimer").innerText = "Time: " + studyTime;
+
+    if(studyTime<=0){
+      clearInterval(s);
+      alert("Time’s up 💜");
+      location.reload();
+    }
+  },1000);
+}
+
+function saveEntry(){
+  let text = document.getElementById("entry").value;
+  localStorage.setItem("diary", text);
+  document.getElementById("saved").innerText = "Saved 💜";
+}
+
+function postGoal(){
+  let goal = document.getElementById("goal").value;
+  let div = document.createElement("p");
+  div.innerText = goal + " 🔥";
+  document.getElementById("goalsList").appendChild(div);
+}
+
+</script>
+
+</body>
+</html>
